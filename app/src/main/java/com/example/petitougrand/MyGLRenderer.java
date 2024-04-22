@@ -28,7 +28,7 @@ import android.util.Log;
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
-    private Square   mSquare;
+    private Forme   mForme;
 
     // Les matrices habituelles Model/View/Projection
 
@@ -47,7 +47,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         /* on va définir une classe Square pour dessiner des carrés */
-        mSquare   = new Square(mSquarePosition);
+        mForme   = new Forme(6, mSquarePosition);
     }
 
     /* Deuxième méthode équivalente à la fonction Display */
@@ -84,7 +84,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mModelMatrix, 0);
 
         /* on appelle la méthode dessin du carré élémentaire */
-        mSquare.draw(scratch);
+        mForme.draw(scratch);
 
     }
 
