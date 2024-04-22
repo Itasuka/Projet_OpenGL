@@ -122,5 +122,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
         return true;
     }
 
+    /**
+     * Utilise la fonction changeForme de mRenderer
+     * @param forme la nouvelle forme
+     * @param position la position de la forme
+     */
+    public void changeForme(int forme, int position){
+        mRenderer.changeForme(forme, position);
+    }
+
 
 }
