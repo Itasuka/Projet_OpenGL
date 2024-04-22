@@ -37,6 +37,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
     final int BICHE = 9;
     final int OURS = 8;
 
+    MyGLSurfaceView myGLSurfaceView;
     List<LinkedList<Integer>> playerCards;
     LinkedList<Integer> queuePlayer;
     int cardInGame;
@@ -54,6 +55,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
         Button buttonEgal = findViewById(R.id.buttonEgal);
         Button buttonPlus = findViewById(R.id.buttonPlus);
         Button buttonStop = findViewById(R.id.buttonStop);
+        myGLSurfaceView = findViewById(R.id.myGLSurfaceView);
 
         newGame();
 
@@ -138,6 +140,8 @@ public class OpenGLES30Activity extends AppCompatActivity {
                 }
             }
         }
+        myGLSurfaceView.changeForme(3,-1);
+        myGLSurfaceView.changeForme(2,1);
         setIntefaceForPlayer();
     }
 
