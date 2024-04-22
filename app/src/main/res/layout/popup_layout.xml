@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Du plus petit au plus grand"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/fourmi"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Fourmi"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/escargot"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Escargot"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 3 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image3"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/grenouille"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Grenouille"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 4 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image4"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/herisson"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Hérisson"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 5 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image5"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/renard"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Renard"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 6 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image6"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/biche"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Biche"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+    <!-- Ligne 7 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/image7"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ours"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Ours"
+            android:layout_marginStart="20dp"/>
+    </LinearLayout>
+
+</LinearLayout>
