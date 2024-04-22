@@ -2,6 +2,7 @@ package com.example.petitougrand;
 
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -36,7 +37,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
     final int BICHE = 9;
     final int OURS = 8;
 
-    List<List<Integer>> playerCards;
+    List<LinkedList<Integer>> playerCards;
     LinkedList<Integer> queuePlayer;
     int cardInGame;
     int nombreDeJoueurs;
@@ -80,7 +81,21 @@ public class OpenGLES30Activity extends AppCompatActivity {
         buttonMoins.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                playLess();
+            }
+        });
 
+        buttonPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playMore();
+            }
+        });
+
+        buttonEgal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playEqual();
             }
         });
     }
@@ -93,6 +108,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
         joueurActuel = 0;
         Random random = new Random();
         int nombreAleatoire = random.nextInt(7);
+        queuePlayer = new LinkedList<>();
         List<Integer> gameCards = new ArrayList<>();
         gameCards.add(FOURMI);
         gameCards.add(ESCARGOT);
@@ -116,7 +132,6 @@ public class OpenGLES30Activity extends AppCompatActivity {
                 Log.d("PlayerCards", String.valueOf(nombreAleatoire));
 
                 if(gameCards.get(nombreAleatoire)!=0){
-                    Log.d("PlayerCardsmod", String.valueOf(i%nombreDeJoueurs));
                     playerCards.get(i%nombreDeJoueurs).add(nombreAleatoire);
                     gameCards.set(nombreAleatoire,gameCards.get(nombreAleatoire)-1);
                     break;
@@ -131,12 +146,54 @@ public class OpenGLES30Activity extends AppCompatActivity {
         TextView score = findViewById(R.id.textScore);
         score.setText(String.valueOf(playerCards.get(joueurActuel).size()));
         joueur.setText("J"+String.valueOf(joueurActuel+1));
+        if (playerCards.get(joueurActuel).size() == 0){
+            showReplayPopup();
+        }
+        displayPlayerCards();
     }
 
     private void endTurn(){
-        if(queuePlayer != null && !queuePlayer.isEmpty())
+        if(queuePlayer != null && !queuePlayer.isEmpty()) {
             cardInGame = queuePlayer.getLast();
+            queuePlayer = new LinkedList<>();
+        }
         joueurActuel = (joueurActuel+1)%nombreDeJoueurs;
+        setIntefaceForPlayer();
+    }
+
+    private void playLess(){
+        queuePlayer.add(playerCards.get(joueurActuel).pop());
+        if(queuePlayer.getLast() >= cardInGame){
+            for (Integer i: queuePlayer) {
+                playerCards.get(joueurActuel).addLast(i);
+            }
+            queuePlayer = new LinkedList<>();
+            endTurn();
+        }
+        setIntefaceForPlayer();
+    }
+
+    private void playMore(){
+        queuePlayer.add(playerCards.get(joueurActuel).pop());
+        if(queuePlayer.getLast() <= cardInGame){
+            for (Integer i: queuePlayer) {
+                playerCards.get(joueurActuel).addLast(i);
+            }
+            queuePlayer = new LinkedList<>();
+            endTurn();
+        }
+        setIntefaceForPlayer();
+    }
+
+    private void playEqual(){
+        queuePlayer.add(playerCards.get(joueurActuel).pop());
+        if(queuePlayer.getLast() != cardInGame){
+            for (Integer i: queuePlayer) {
+                playerCards.get(joueurActuel).addLast(i);
+            }
+            queuePlayer = new LinkedList<>();
+            endTurn();
+        }
         setIntefaceForPlayer();
     }
 
@@ -178,24 +235,33 @@ public class OpenGLES30Activity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void displayPlayerCards() {
-        // Map pour stocker le cumul de chaque entier
-        Map<Integer, Integer> cumul = new HashMap<>();
-
-        // Parcourir toutes les listes de cartes des joueurs
-        for (List<Integer> cards : playerCards) {
-            // Parcourir toutes les cartes dans la liste
-            for (int card : cards) {
-                // Mettre à jour le cumul de la carte dans la Map
-                cumul.put(card, cumul.getOrDefault(card, 0) + 1);
+    public void showReplayPopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Voulez-vous rejouer ?");
+        builder.setMessage("Le joueur " + (joueurActuel+1) + " a gagné");
+        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                newGame();
+                dialog.dismiss();
             }
-        }
+        });
+        builder.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
-        // Afficher le cumul de chaque entier dans les listes de cartes des joueurs
-        for (Map.Entry<Integer, Integer> entry : cumul.entrySet()) {
-            int card = entry.getKey();
-            int count = entry.getValue();
-            Log.d("PlayerCards", "Cumul de " + card + " : " + count);
+    private void displayPlayerCards() {
+        Log.d("PlayerCards", "Cartes en jeu: " + cardInGame);
+        for (int i = 0; i < playerCards.size(); i++) {
+            List<Integer> cards = playerCards.get(i);
+            Log.d("PlayerCards", "Cartes du joueur " + i + ": " + cards.toString());
         }
     }
 }
