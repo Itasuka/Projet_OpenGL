@@ -59,6 +59,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     /* Comment interpréter les événements sur l'écran tactile */
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+
         // Les coordonnées du point touché sur l'écran
         float x = e.getX();
         float y = e.getY();
@@ -105,7 +106,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
             switch (e.getAction()) {
                 /* Lorsqu'on touche l'écran on mémorise juste le point */
-                case MotionEvent.ACTION_DOWN:
+              /*  case MotionEvent.ACTION_DOWN:
                     mPreviousX = x;
                     mPreviousY = y;
                     condition=true;
@@ -114,11 +115,12 @@ public class MyGLSurfaceView extends GLSurfaceView {
                    mRenderer.setPosition(0.0f,-9.0f);
                     requestRender(); // Pour relancer le dessin
                     condition=false;
-
+*/
             }
         }
 
         return true;
     }
+
 
 }

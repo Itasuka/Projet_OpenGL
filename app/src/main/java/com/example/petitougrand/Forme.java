@@ -18,11 +18,8 @@ package com.example.petitougrand;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import android.opengl.GLES20;
-import android.util.Log;
 
 //import android.opengl.GLES20;
 import android.opengl.GLES30;
@@ -142,10 +139,10 @@ public class Forme {
             0.0f, 1.0f, 0.0f, 1.0f}; //5
 
     static float renardCoords[] = {
-            -5f, -2.25f, 0.0f, //0
-            5f,  -2.25f, 0.0f, //1
-            -3f,  2.25f, 0.0f, //2
-            7f, 2.25f, 0.0f}; //3
+            -6.5f, -2.25f, 0.0f, //0
+            3.5f,  -2.25f, 0.0f, //1
+            -3.5f,  2.25f, 0.0f, //2
+            6.5f, 2.25f, 0.0f}; //3
 
     static float renardColors[] = {
             1.0f, 0.0f, 0.0f, 1.0f, //0
@@ -209,13 +206,32 @@ public class Forme {
             0.0f, 1.0f, 0.0f, 1.0f, //10
             0.0f, 1.0f, 0.0f, 1.0f}; //11
 
+    private static float hauteurForme(int position){
+        return position * (11f * 412f/915f);
+    }
+
     private final int vertexStride = COORDS_PER_VERTEX * 4; // le pas entre 2 sommets : 4 bytes per vertex
 
     private final int couleurStride = COULEURS_PER_VERTEX * 4; // le pas entre 2 couleurs
 
-    private final float Position[] = {0.0f,0.0f};
+    private static float[] decale(float[] coords, int position){
+        float[] res = new float[coords.length];
+        for (int i = 0; i < coords.length; ++i){
+            if (i%3 == 1){
+                res[i] = coords[i] + hauteurForme(position);
+            }
+            else{
+                res[i] = coords[i];
+            }
+        }
+        return res;
+    }
 
-    public Forme(int forme, float[] Pos) {
+    /**
+     * Créer une forme parmis les 7 du jeu
+     * @param forme le numéro correspondant à la forme du jeu, dans l'ordre de 0 à 6 (fourmis, escargot, grenouille, hérisson, renard, biche et ours)
+     */
+    public Forme(int forme, int position) {
         float coords[];
         float couleurs[];
         switch (forme){
@@ -296,8 +312,7 @@ public class Forme {
                 break;
 
         }
-        Position[0] = Pos[0];
-        Position[1] = Pos[1];
+        coords = decale(coords, position);
         // initialisation du buffer pour les vertex (4 bytes par float)
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -338,11 +353,6 @@ public class Forme {
     }
 
 
-
-    public void set_position(float[] pos) {
-        Position[0]=pos[0];
-        Position[1]=pos[1];
-    }
     /* La fonction Display */
     public void draw(float[] mvpMatrix) {
         // Add program to OpenGL environment

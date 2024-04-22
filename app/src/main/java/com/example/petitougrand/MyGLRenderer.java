@@ -28,7 +28,8 @@ import android.util.Log;
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
-    private Forme   mForme;
+    private Forme mFormeHaute = new Forme(-1, 0);
+    private Forme mFormeBasse = new Forme(-1, 0);
 
     // Les matrices habituelles Model/View/Projection
 
@@ -37,7 +38,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mViewMatrix = new float[16];
     private final float[] mModelMatrix = new float[16];
 
-    private float[] mSquarePosition = {0.0f, 0.0f};
+    private float[] formePosition = {0.0f, 0.0f};
 
     /* Première méthode équivalente à la fonction init en OpenGLSL */
     @Override
@@ -47,7 +48,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         /* on va définir une classe Square pour dessiner des carrés */
-        mForme   = new Forme(6, mSquarePosition);
+        //mFormeHaute   = new Forme(6, 1);
+        //mFormeBasse   = new Forme(5, -1);
     }
 
     /* Deuxième méthode équivalente à la fonction Display */
@@ -75,16 +77,17 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         /* Pour définir une translation on donne les paramètres de la translation
         et la matrice (ici mModelMatrix) est multipliée par la translation correspondante
          */
-        Matrix.translateM(mModelMatrix, 0, mSquarePosition[0], mSquarePosition[1], 0);
+        Matrix.translateM(mModelMatrix, 0, formePosition[0], formePosition[1], 0);
 
-        Log.d("Renderer", "mSquarex"+Float.toString(mSquarePosition[0]));
-        Log.d("Renderer", "mSquarey"+Float.toString(mSquarePosition[1]));
+        Log.d("Renderer", "mSquarex"+Float.toString(formePosition[0]));
+        Log.d("Renderer", "mSquarey"+Float.toString(formePosition[1]));
 
         /* scratch est la matrice PxVxM finale */
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mModelMatrix, 0);
 
         /* on appelle la méthode dessin du carré élémentaire */
-        mForme.draw(scratch);
+        mFormeHaute.draw(scratch);
+        mFormeBasse.draw(scratch);
 
     }
 
@@ -118,13 +121,35 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void setPosition(float x, float y) {
         /*mSquarePosition[0] += x;
         mSquarePosition[1] += y;*/
-        mSquarePosition[0] = x;
-        mSquarePosition[1] = y;
+        formePosition[0] = x;
+        formePosition[1] = y;
 
     }
 
     public float[] getPosition() {
-        return mSquarePosition;
+        return formePosition;
+    }
+
+    /**
+     * Change la carte voulu (au-dessus ou en-dessous)
+     * @param forme la nouvelle forme
+     * @param position la position de la forme qui change (-1 en bas et 1 en haut)
+     */
+    public void changeForme(int forme, int position){
+        switch (position){
+            case -1:
+                mFormeBasse = new Forme(forme, position);
+                break;
+
+            case 1:
+                mFormeHaute = new Forme(forme, position);
+                break;
+
+            default:
+                Log.d("Forme", "Mauvais choix de position pour la forme");
+                break;
+        }
+        onDrawFrame(null);
     }
 
 }
