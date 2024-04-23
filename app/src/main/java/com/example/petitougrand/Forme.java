@@ -247,7 +247,7 @@ public class Forme {
      */
     public Forme(int forme, int position) {
         this.forme = forme;
-        float coords[] = decale(formeCoords(forme), new int[]{1,position * 12});
+        float coords[] = decale(formeCoords(forme), new int[]{0,position * 12});
         this.coords = coords;
         float couleurs[] = formeCouleurs(forme);
         indices = formeIndices(forme);
@@ -303,7 +303,7 @@ public class Forme {
     }
 
     public void changerForme(int forme, int position){
-        float[] coords = decale(formeCoords(forme), new int[]{1,position * 12});
+        float[] coords = decale(formeCoords(forme), new int[]{0,position * 12});
         float[] couleurs = formeCouleurs(forme);
         indices = formeIndices(forme);
 
