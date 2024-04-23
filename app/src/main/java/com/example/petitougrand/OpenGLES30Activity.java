@@ -49,57 +49,10 @@ public class OpenGLES30Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button buttonCarte = findViewById(R.id.buttonCarte);
-        Button buttonAide = findViewById(R.id.buttonAide);
-        Button buttonMoins = findViewById(R.id.buttonMoins);
-        Button buttonEgal = findViewById(R.id.buttonEgal);
-        Button buttonPlus = findViewById(R.id.buttonPlus);
-        Button buttonStop = findViewById(R.id.buttonStop);
         myGLSurfaceView = findViewById(R.id.myGLSurfaceView);
+        myGLSurfaceView.setApplication(this);
 
         newGame();
-
-        buttonCarte.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showCardPopup();
-            }
-        });
-
-        buttonAide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showHelpPopup();
-            }
-        });
-
-        buttonStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                endTurn();
-            }
-        });
-
-        buttonMoins.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playLess();
-            }
-        });
-
-        buttonPlus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playMore();
-            }
-        });
-
-        buttonEgal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playEqual();
-            }
-        });
     }
 
     private void newGame(){
@@ -145,8 +98,12 @@ public class OpenGLES30Activity extends AppCompatActivity {
 
     private void setIntefaceForPlayer(){
         myGLSurfaceView = findViewById(R.id.myGLSurfaceView);
-        myGLSurfaceView.changeForme(3,-1);
-        myGLSurfaceView.changeForme(2,1);
+        myGLSurfaceView.changeForme(cardInGame,1);
+        if(queuePlayer.isEmpty())
+            myGLSurfaceView.changeForme(-1,-1);
+        else
+            myGLSurfaceView.changeForme(queuePlayer.getLast(), -1);
+        myGLSurfaceView.requestRender();
         TextView joueur = findViewById(R.id.textJoueur);
         TextView score = findViewById(R.id.textScore);
         score.setText(String.valueOf(playerCards.get(joueurActuel).size()));
@@ -157,17 +114,26 @@ public class OpenGLES30Activity extends AppCompatActivity {
         displayPlayerCards();
     }
 
-    private void endTurn(){
-        if(queuePlayer != null && !queuePlayer.isEmpty()) {
-            cardInGame = queuePlayer.getLast();
-            queuePlayer = new LinkedList<>();
-        }
+    public void endTurn(){
         joueurActuel = (joueurActuel+1)%nombreDeJoueurs;
-        setIntefaceForPlayer();
+        String message = "Vous vous êtes trompé!";
+        if(queuePlayer != null && !queuePlayer.isEmpty())
+            message = "Vous passez votre tour!";
+        showNextPlayerPopup(new PopupClosedListener() {
+            @Override
+            public void onPopupClosed() {
+                if(queuePlayer != null && !queuePlayer.isEmpty()) {
+                    cardInGame = queuePlayer.getLast();
+                    queuePlayer = new LinkedList<>();
+                }
+                setIntefaceForPlayer();
+            }
+        }, message);
     }
 
-    private void playLess(){
+    public void playLess(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
+        setIntefaceForPlayer();
         if(queuePlayer.getLast() >= cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -175,11 +141,11 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
-        setIntefaceForPlayer();
     }
 
-    private void playMore(){
+    public void playMore(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
+        setIntefaceForPlayer();
         if(queuePlayer.getLast() <= cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -187,11 +153,11 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
-        setIntefaceForPlayer();
     }
 
-    private void playEqual(){
+    public void playEqual(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
+        setIntefaceForPlayer();
         if(queuePlayer.getLast() != cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -199,22 +165,21 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
-        setIntefaceForPlayer();
     }
 
-    private void showCardPopup() {
+    public void showCardPopup() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.popup_layout);
         dialog.show();
     }
 
-    private void showHelpPopup() {
+    public void showHelpPopup() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.popup_card);
         dialog.show();
     }
 
-    void showPlayersPopup() {
+    public void showPlayersPopup() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.popup_players);
 
@@ -259,6 +224,22 @@ public class OpenGLES30Activity extends AppCompatActivity {
             }
         });
         AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showNextPlayerPopup(PopupClosedListener listener, String message){
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.popup_nextplayer);
+        TextView player = dialog.findViewById(R.id.joueur);
+        TextView reason = dialog.findViewById(R.id.raison);
+        player.setText(String.valueOf(joueurActuel+1));
+        reason.setText(message);
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                listener.onPopupClosed();
+            }
+        });
         dialog.show();
     }
 

@@ -17,6 +17,7 @@
 package com.example.petitougrand;
 
 import android.content.Context;
+import android.graphics.Path;
 import android.opengl.EGLConfig;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
@@ -37,6 +38,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     /* MyGLRenderer va implémenter les méthodes de cette interface */
 
     private MyGLRenderer mRenderer;
+    private OpenGLES30Activity openGLES30Activity;
 
     public MyGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -127,6 +129,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.playMore();
                     Log.d("Touche", "Touche le bouton plus");
                     break;
             }
@@ -137,6 +140,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.playLess();
                     Log.d("Touche", "Touche le bouton moins");
                     break;
             }
@@ -147,6 +151,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.playEqual();
                     Log.d("Touche", "Touche le bouton egale");
                     break;
             }
@@ -157,6 +162,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.endTurn();
                     Log.d("Touche", "Touche le bouton passer le tour");
                     break;
             }
@@ -167,6 +173,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.showCardPopup();
                     Log.d("Touche", "Touche le bouton aide des cartes");
                     break;
             }
@@ -177,6 +184,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
                 case MotionEvent.ACTION_DOWN:
                     break;
                 case MotionEvent.ACTION_UP:
+                    openGLES30Activity.showHelpPopup();
                     Log.d("Touche", "Touche le bouton regles");
                     break;
             }
@@ -221,6 +229,6 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public void changeForme(int forme, int position){
         mRenderer.changeForme(forme, position);
     }
-
+    public void setApplication(OpenGLES30Activity openGLES30Activity){this.openGLES30Activity = openGLES30Activity;}
 
 }
