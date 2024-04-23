@@ -108,7 +108,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
         TextView score = findViewById(R.id.textScore);
         score.setText(String.valueOf(playerCards.get(joueurActuel).size()));
         joueur.setText("J"+String.valueOf(joueurActuel+1));
-        if (playerCards.get(joueurActuel).size() == 0){
+        if (playerCards.get(joueurActuel).size() == 0 && queuePlayer.isEmpty()){
             showReplayPopup();
         }
         displayPlayerCards();
