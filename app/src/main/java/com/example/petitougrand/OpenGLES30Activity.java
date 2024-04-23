@@ -140,8 +140,6 @@ public class OpenGLES30Activity extends AppCompatActivity {
                 }
             }
         }
-        myGLSurfaceView.changeForme(3,-1);
-        myGLSurfaceView.changeForme(2,1);
         setIntefaceForPlayer();
     }
 

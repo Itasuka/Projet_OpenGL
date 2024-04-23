@@ -15,6 +15,10 @@
  */
 package com.example.petitougrand;
 
+
+import static java.lang.Float.max;
+import static java.lang.Float.min;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -30,6 +34,12 @@ import android.opengl.GLES30;
 public class Forme {
 /* Le vertex shader avec la définition de gl_Position et les variables utiles au fragment shader
  */
+
+    private int forme;
+
+    public int getForme(){
+        return forme;
+    }
     private final String vertexShaderCode =
         "#version 300 es\n"+
                 "uniform mat4 uMVPMatrix;\n"+
@@ -60,14 +70,14 @@ public class Forme {
 
     /* les déclarations pour l'équivalent des VBO */
 
-    private final FloatBuffer vertexBuffer; // Pour le buffer des coordonnées des sommets du carré
-    private final ShortBuffer indiceBuffer; // Pour le buffer des indices
-    private final FloatBuffer colorBuffer; // Pour le buffer des couleurs des sommets
+    private FloatBuffer vertexBuffer; // Pour le buffer des coordonnées des sommets du carré
+    private ShortBuffer indiceBuffer; // Pour le buffer des indices
+    private FloatBuffer colorBuffer; // Pour le buffer des couleurs des sommets
 
     /* les déclarations pour les shaders
     Identifiant du programme et pour les variables attribute ou uniform
      */
-    private final int IdProgram; // identifiant du programme pour lier les shaders
+    private int IdProgram; // identifiant du programme pour lier les shaders
     private int IdPosition; // idendifiant (location) pour transmettre les coordonnées au vertex shader
     private int IdCouleur; // identifiant (location) pour transmettre les couleurs
     private int IdMVPMatrix; // identifiant (location) pour transmettre la matrice PxVxM
@@ -82,6 +92,7 @@ public class Forme {
      Oui ce n'est pas joli avec 1.0 en dur ....
      */
 
+    private float[] coords;
     private short indices[];
 
     static float fourmisCoords[] = {
@@ -207,18 +218,21 @@ public class Forme {
             0.0f, 1.0f, 0.0f, 1.0f}; //11
 
     private static float hauteurForme(int position){
-        return position * (11f * 412f/915f);
+        return position * (412f/915f);
     }
 
     private final int vertexStride = COORDS_PER_VERTEX * 4; // le pas entre 2 sommets : 4 bytes per vertex
 
     private final int couleurStride = COULEURS_PER_VERTEX * 4; // le pas entre 2 couleurs
 
-    private static float[] decale(float[] coords, int position){
+    private static float[] decale(float[] coords, int[] position){
         float[] res = new float[coords.length];
         for (int i = 0; i < coords.length; ++i){
-            if (i%3 == 1){
-                res[i] = coords[i] + hauteurForme(position);
+            if (i%3 == 0){
+                res[i] = coords[i] + position[0];
+            }
+            else if (i%3 == 1){
+                res[i] = coords[i] + hauteurForme(position[1]);
             }
             else{
                 res[i] = coords[i];
@@ -232,87 +246,17 @@ public class Forme {
      * @param forme le numéro correspondant à la forme du jeu, dans l'ordre de 0 à 6 (fourmis, escargot, grenouille, hérisson, renard, biche et ours)
      */
     public Forme(int forme, int position) {
-        float coords[];
-        float couleurs[];
-        switch (forme){
-            case 0:
-                coords = fourmisCoords;
-                couleurs = fourmisColors;
-                indices = new short[]{
-                        0, 2, 3, //0
-                        0, 1, 3}; //1
-                break;
+        this.forme = forme;
+        float coords[] = decale(formeCoords(forme), new int[]{1,position * 12});
+        this.coords = coords;
+        float couleurs[] = formeCouleurs(forme);
+        indices = formeIndices(forme);
 
-            case 1:
-                coords = escargotCoords;
-                couleurs = escargotColors;
-                indices = new short[]{
-                        0, 1, 2}; //0
-                break;
+        initBuffer(coords,couleurs);
+        createOpenGLProgram();
+    }
 
-            case 2:
-                coords = grenouilleCoords;
-                couleurs = grenouilleColors;
-                indices = new short[]{
-                        0, 2, 4, //0
-                        0, 1, 4, //1
-                        1, 4, 3}; //2
-                break;
-
-            case 3:
-                coords = herissonCoords;
-                couleurs = herissonColors;
-                indices = new short[]{
-                        0, 2, 5, //0
-                        0, 1, 5, //1
-                        1, 5, 3, //2
-                        2, 3, 4}; //3
-                break;
-
-            case 4:
-                coords = renardCoords;
-                couleurs = renardColors;
-                indices = new short[]{
-                        0, 1, 2, //0
-                        1, 2, 3}; //1
-                break;
-
-            case 5:
-                coords = bicheCoords;
-                couleurs = bicheColors;
-                indices = new short[]{
-                        0, 2, 8, //0
-                        0, 1, 8, //1
-                        1, 8, 9, //2
-                        1, 9, 3, //3
-                        2, 3, 4, //4
-                        3, 4, 5, //5
-                        4, 10, 6, //6
-                        10, 11, 6, //7
-                        11, 6, 7, //8
-                        11, 5, 7}; //9
-                break;
-
-            case 6:
-                coords = oursCoords;
-                couleurs = oursColors;
-                indices = new short[]{
-                        0, 1, 3, //0
-                        1, 3, 4, //1
-                        2, 5, 6, //2
-                        5, 6, 9, //3
-                        7, 8, 10, //4
-                        8, 10, 11}; //5
-                break;
-
-            default:
-                coords = new float[0];
-                couleurs = new float[0];
-                indices = new short[0];
-                break;
-
-        }
-        coords = decale(coords, position);
+    public void initBuffer(float[] coords, float[] couleurs){
         // initialisation du buffer pour les vertex (4 bytes par float)
         ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -334,7 +278,9 @@ public class Forme {
         indiceBuffer = dlb.asShortBuffer();
         indiceBuffer.put(indices);
         indiceBuffer.position(0);
+    }
 
+    public void createOpenGLProgram(){
         /* Chargement des shaders */
         int vertexShader = MyGLRenderer.loadShader(
                 GLES30.GL_VERTEX_SHADER,
@@ -348,8 +294,296 @@ public class Forme {
         GLES30.glAttachShader(IdProgram, fragmentShader); // add the fragment shader to program
         GLES30.glLinkProgram(IdProgram);                  // create OpenGL program executables
         GLES30.glGetProgramiv(IdProgram, GLES30.GL_LINK_STATUS,linkStatus,0);
+    }
+    public Forme(float[] coords, float[] couleurs, short[] indices){
+        this.indices = indices;
+        this.coords = coords;
+        initBuffer(coords, couleurs);
+        createOpenGLProgram();
+    }
 
+    public void changerForme(int forme, int position){
+        float[] coords = decale(formeCoords(forme), new int[]{1,position * 12});
+        float[] couleurs = formeCouleurs(forme);
+        indices = formeIndices(forme);
 
+        vertexBuffer.clear();
+        colorBuffer.clear();
+        indiceBuffer.clear();
+        initBuffer(coords, couleurs);
+    }
+
+    public float[] formeCoords(int forme){
+        float[] coords;
+        switch (forme){
+            case 0:
+                coords = fourmisCoords;
+                break;
+            case 1:
+                coords = escargotCoords;
+                break;
+            case 2:
+                coords = grenouilleCoords;
+                break;
+            case 3:
+                coords = herissonCoords;
+                break;
+            case 4:
+                coords = renardCoords;
+                break;
+            case 5:
+                coords = bicheCoords;
+                break;
+            case 6:
+                coords = oursCoords;
+                break;
+
+            default:
+                coords = new float[0];
+                break;
+        }
+        return coords;
+    }
+
+    public float[] formeCouleurs(int forme){
+        float[] couleurs;
+        switch (forme){
+            case 0:
+                couleurs = fourmisColors;
+                break;
+
+            case 1:
+                couleurs = escargotColors;
+                break;
+
+            case 2:
+                couleurs = grenouilleColors;
+                break;
+
+            case 3:
+                couleurs = herissonColors;
+                break;
+
+            case 4:
+                couleurs = renardColors;
+                break;
+
+            case 5:
+                couleurs = bicheColors;
+                break;
+
+            case 6:
+                couleurs = oursColors;
+                break;
+
+            default:
+                couleurs = new float[0];
+                break;
+        }
+        return couleurs;
+    }
+
+    public short[] formeIndices(int forme){
+        short[] indices;
+        switch (forme){
+            case 0:
+                indices = new short[]{
+                        0, 2, 3, //0
+                        0, 1, 3}; //1
+                break;
+
+            case 1:
+                indices = new short[]{
+                        0, 1, 2}; //0
+                break;
+
+            case 2:
+                indices = new short[]{
+                        0, 2, 4, //0
+                        0, 1, 4, //1
+                        1, 4, 3}; //2
+                break;
+
+            case 3:
+                indices = new short[]{
+                        0, 2, 5, //0
+                        0, 1, 5, //1
+                        1, 5, 3, //2
+                        2, 3, 4}; //3
+                break;
+
+            case 4:
+                indices = new short[]{
+                        0, 1, 2, //0
+                        1, 2, 3}; //1
+                break;
+
+            case 5:
+                indices = new short[]{
+                        0, 2, 8, //0
+                        0, 1, 8, //1
+                        1, 8, 9, //2
+                        1, 9, 3, //3
+                        2, 3, 4, //4
+                        3, 4, 5, //5
+                        4, 10, 6, //6
+                        10, 11, 6, //7
+                        11, 6, 7, //8
+                        11, 5, 7}; //9
+                break;
+
+            case 6:
+                indices = new short[]{
+                        0, 1, 3, //0
+                        1, 3, 4, //1
+                        2, 5, 6, //2
+                        5, 6, 9, //3
+                        7, 8, 10, //4
+                        8, 10, 11}; //5
+                break;
+
+            default:
+                indices = new short[0];
+                break;
+        }
+        return indices;
+    }
+
+    public static Forme boutonsPlus(){
+        float[] coords = {
+                -0.5f, -0.67f, 0.0f, //0
+                0.5f,  -0.67f, 0.0f, //1
+                -1.5f, -0.22f, 0.0f, //2
+                -0.5f, 0.22f, 0.0f, //3
+                0.5f, 0.22f, 0.0f, //4
+                1.5f,  -0.22f, 0.0f, //5
+                -1.5f, 0.22f, 0.0f, //6
+                -0.5f, 0.22f, 0.0f, //7
+                0.5f, 0.22f, 0.0f, //8
+                1.5f,  0.22f, 0.0f, //9
+                -0.5f, 0.67f, 0.0f, //10
+                0.5f,  0.67f, 0.0f}; //11
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f, //3
+                1.0f, 1.0f, 1.0f, 1.0f, //4
+                1.0f, 1.0f, 1.0f, 1.0f, //5
+                0.0f, 1.0f, 0.0f, 1.0f, //6
+                1.0f, 0.0f, 0.0f, 1.0f, //7
+                1.0f, 1.0f, 1.0f, 1.0f, //8
+                1.0f, 1.0f, 1.0f, 1.0f, //9
+                0.0f, 1.0f, 0.0f, 1.0f, //10
+                0.0f, 1.0f, 0.0f, 1.0f}; //11
+        short[] indices = new short[]{
+                0, 1, 3, //0
+                1, 3, 4, //1
+                2, 5, 6, //2
+                5, 6, 9, //3
+                7, 8, 10, //4
+                8, 10, 11}; //5
+        coords = decale(coords, new int[]{7, 0});
+        return new Forme(coords,couleurs,indices);
+    }
+
+    public static Forme boutonsMoins(){
+        float[] coords = {
+                -1.5f, -0.22f, 0.0f, //0
+                1.5f,  -0.22f, 0.0f, //1
+                -1.5f, 0.22f, 0.0f, //2
+                1.5f,  0.22f, 0.0f}; //3
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f}; //3
+        short[] indices = new short[]{
+                0, 1, 2, //0
+                1, 2, 3}; //1
+        coords = decale(coords, new int[]{-7, 0});
+        return new Forme(coords,couleurs,indices);
+    }
+
+    public static Forme boutonsEgale(){
+        float[] coords = {
+                -1.5f, -0.67f, 0.0f, //0
+                1.5f,  -0.67f, 0.0f, //1
+                -1.5f, -0.22f, 0.0f, //2
+                1.5f,  -0.22f, 0.0f, //3
+                -1.5f, 0.22f, 0.0f, //4
+                1.5f,  0.22f, 0.0f, //5
+                -1.5f, 0.67f, 0.0f, //6
+                1.5f,  0.67f, 0.0f}; //7
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f, //3
+                1.0f, 1.0f, 1.0f, 1.0f, //4
+                1.0f, 1.0f, 1.0f, 1.0f, //5
+                1.0f, 1.0f, 1.0f, 1.0f, //6
+                1.0f, 0.0f, 0.0f, 1.0f}; //7
+        short[] indices = new short[]{
+                0, 1, 2, //0
+                1, 2, 3, //1
+                4, 5, 6, //2
+                5, 6, 7}; //3
+        return new Forme(coords,couleurs,indices);
+    }
+
+    public static Forme boutonsPasserTour(){
+        float[] coords = {
+                -2.5f, -0.22f, 0.0f, //0
+                2.5f,  -0.22f, 0.0f, //1
+                -2.5f, 0.22f, 0.0f, //2
+                2.5f,  0.22f, 0.0f}; //3
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f}; //3
+        short[] indices = new short[]{
+                0, 1, 2, //0
+                1, 2, 3}; //1
+        coords = decale(coords, new int[]{0, -3});
+        return new Forme(coords,couleurs,indices);
+    }
+
+    public static Forme boutonsAideCartes(){
+        float[] coords = {
+                -1f, -0.45f, 0.0f, //0
+                1f,  -0.45f, 0.0f, //1
+                -1f, 0.45f, 0.0f, //2
+                1f,  0.45f, 0.0f}; //3
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f}; //3
+        short[] indices = new short[]{
+                0, 1, 2, //0
+                1, 2, 3}; //1
+        coords = decale(coords, new int[]{-8, 20});
+        return new Forme(coords,couleurs,indices);
+    }
+
+    public static Forme boutonsRegles(){
+        float[] coords = {
+                -1f, -0.45f, 0.0f, //0
+                1f,  -0.45f, 0.0f, //1
+                -1f, 0.45f, 0.0f, //2
+                1f,  0.45f, 0.0f}; //3
+        float[] couleurs = {
+                1.0f, 0.0f, 0.0f, 1.0f, //0
+                1.0f, 1.0f, 1.0f, 1.0f, //1
+                1.0f, 1.0f, 1.0f, 1.0f, //2
+                1.0f, 0.0f, 0.0f, 1.0f}; //3
+        short[] indices = new short[]{
+                0, 1, 2, //0
+                1, 2, 3}; //1
+        coords = decale(coords, new int[]{8, 20});
+        return new Forme(coords,couleurs,indices);
     }
 
 
@@ -395,6 +629,25 @@ public class Forme {
         GLES30.glDisableVertexAttribArray(IdPosition);
         GLES30.glDisableVertexAttribArray(IdCouleur);
 
+    }
+
+    public float[] minMaxCoords(){
+        float[] res = new float[4];
+        res[0] = 1000;
+        res[1] = -1000;
+        res[2] = 1000;
+        res[3] = -1000;
+        for (int i = 0; i < coords.length; ++i){
+            if (i%3 == 0){
+                res[0] = min(res[0], coords[i]);
+                res[1] = max(res[1], coords[i]);
+            }
+            else if (i%3 == 1){
+                res[2] = min(res[2], coords[i]);
+                res[3] = max(res[3], coords[i]);
+            }
+        }
+        return res;
     }
 
 }
