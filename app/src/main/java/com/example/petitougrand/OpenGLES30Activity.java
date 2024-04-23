@@ -140,12 +140,13 @@ public class OpenGLES30Activity extends AppCompatActivity {
                 }
             }
         }
-        myGLSurfaceView.changeForme(3,-1);
-        myGLSurfaceView.changeForme(2,1);
         setIntefaceForPlayer();
     }
 
     private void setIntefaceForPlayer(){
+        myGLSurfaceView = findViewById(R.id.myGLSurfaceView);
+        myGLSurfaceView.changeForme(3,-1);
+        myGLSurfaceView.changeForme(2,1);
         TextView joueur = findViewById(R.id.textJoueur);
         TextView score = findViewById(R.id.textScore);
         score.setText(String.valueOf(playerCards.get(joueurActuel).size()));
@@ -220,7 +221,7 @@ public class OpenGLES30Activity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false);
 
         Spinner spinnerNumbers = dialog.findViewById(R.id.spinnerJoueurs);
-        String[] numbers = {"2", "3", "4"};
+        String[] numbers = {"1", "2", "3", "4", "5"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, numbers);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerNumbers.setAdapter(adapter);
