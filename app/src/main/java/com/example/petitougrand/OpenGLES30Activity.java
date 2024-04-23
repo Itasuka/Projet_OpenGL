@@ -108,9 +108,8 @@ public class OpenGLES30Activity extends AppCompatActivity {
         TextView score = findViewById(R.id.textScore);
         score.setText(String.valueOf(playerCards.get(joueurActuel).size()));
         joueur.setText("J"+String.valueOf(joueurActuel+1));
-        if (playerCards.get(joueurActuel).size() == 0 && queuePlayer.isEmpty()){
+        if (playerCards.get(joueurActuel).size() == 0)
             showReplayPopup();
-        }
         displayPlayerCards();
     }
 
@@ -119,21 +118,21 @@ public class OpenGLES30Activity extends AppCompatActivity {
         String message = "Vous vous êtes trompé!";
         if(queuePlayer != null && !queuePlayer.isEmpty())
             message = "Vous passez votre tour!";
+
         showNextPlayerPopup(new PopupClosedListener() {
-            @Override
-            public void onPopupClosed() {
-                if(queuePlayer != null && !queuePlayer.isEmpty()) {
-                    cardInGame = queuePlayer.getLast();
-                    queuePlayer = new LinkedList<>();
+                @Override
+                public void onPopupClosed() {
+                    if (queuePlayer != null && !queuePlayer.isEmpty()) {
+                        cardInGame = queuePlayer.getLast();
+                        queuePlayer = new LinkedList<>();
+                    }
+                    setIntefaceForPlayer();
                 }
-                setIntefaceForPlayer();
-            }
-        }, message);
+            }, message);
     }
 
     public void playLess(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
-        setIntefaceForPlayer();
         if(queuePlayer.getLast() >= cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -141,11 +140,12 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
+        else
+            setIntefaceForPlayer();
     }
 
     public void playMore(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
-        setIntefaceForPlayer();
         if(queuePlayer.getLast() <= cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -153,11 +153,12 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
+        else
+            setIntefaceForPlayer();
     }
 
     public void playEqual(){
         queuePlayer.add(playerCards.get(joueurActuel).pop());
-        setIntefaceForPlayer();
         if(queuePlayer.getLast() != cardInGame){
             for (Integer i: queuePlayer) {
                 playerCards.get(joueurActuel).addLast(i);
@@ -165,6 +166,8 @@ public class OpenGLES30Activity extends AppCompatActivity {
             queuePlayer = new LinkedList<>();
             endTurn();
         }
+        else
+            setIntefaceForPlayer();
     }
 
     public void showCardPopup() {
