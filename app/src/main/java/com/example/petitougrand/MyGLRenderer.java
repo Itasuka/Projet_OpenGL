@@ -28,8 +28,14 @@ import android.util.Log;
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
-    private Forme mFormeHaute = new Forme(-1, 0);
-    private Forme mFormeBasse = new Forme(-1, 0);
+    private Forme mFormeHaute;
+    private Forme mFormeBasse;
+    private Forme boutonPlus;
+    private Forme boutonMoins;
+    private Forme boutonEgale;
+    private Forme boutonPasserTour;
+    private Forme boutonAideCartes;
+    private Forme boutonRegles;
 
     // Les matrices habituelles Model/View/Projection
 
@@ -48,8 +54,14 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         /* on va définir une classe Square pour dessiner des carrés */
-        //mFormeHaute   = new Forme(6, 1);
-        //mFormeBasse   = new Forme(5, -1);
+        mFormeHaute   = new Forme(-1, 1);
+        mFormeBasse   = new Forme(-1, -1);
+        boutonPlus = Forme.boutonsPlus();
+        boutonMoins = Forme.boutonsMoins();
+        boutonEgale = Forme.boutonsEgale();
+        boutonPasserTour = Forme.boutonsPasserTour();
+        boutonAideCartes = Forme.boutonsAideCartes();
+        boutonRegles = Forme.boutonsRegles();
     }
 
     /* Deuxième méthode équivalente à la fonction Display */
@@ -69,7 +81,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
          */
         Matrix.setIdentityM(mViewMatrix,0);
 
-        // Calculate the projection and view transformation
+        // Calculate the projection and view transformation*
+        float ratio = 412f/915f;
+        //Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -16f, 16f, 1f, 7f);
+        //Matrix.setLookAtM(mViewMatrix, 0, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0.0f, 0.0f);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         Matrix.setIdentityM(mModelMatrix,0);
@@ -88,6 +103,13 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         /* on appelle la méthode dessin du carré élémentaire */
         mFormeHaute.draw(scratch);
         mFormeBasse.draw(scratch);
+        boutonPlus.draw(scratch);
+        boutonMoins.draw(scratch);
+        boutonEgale.draw(scratch);
+        boutonPasserTour.draw(scratch);
+        boutonAideCartes.draw(scratch);
+        boutonRegles.draw(scratch);
+        Log.d("Forme", "Forme dessinées");
 
     }
 
@@ -138,18 +160,41 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void changeForme(int forme, int position){
         switch (position){
             case -1:
-                mFormeBasse = new Forme(forme, position);
+                mFormeBasse.changerForme(forme, position);
                 break;
 
             case 1:
-                mFormeHaute = new Forme(forme, position);
+                mFormeHaute.changerForme(forme, position);
                 break;
 
             default:
                 Log.d("Forme", "Mauvais choix de position pour la forme");
                 break;
         }
-        onDrawFrame(null);
+        Log.d("Forme", "Je dessine : " + forme + " à la position : " + position);
     }
 
+    public Forme getBoutonPlus() {
+        return boutonPlus;
+    }
+
+    public Forme getBoutonMoins() {
+        return boutonMoins;
+    }
+
+    public Forme getBoutonEgale() {
+        return boutonEgale;
+    }
+
+    public Forme getBoutonPasserTour() {
+        return boutonPasserTour;
+    }
+
+    public Forme getBoutonAideCartes() {
+        return boutonAideCartes;
+    }
+
+    public Forme getBoutonRegles() {
+        return boutonRegles;
+    }
 }
